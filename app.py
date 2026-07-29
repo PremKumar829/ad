@@ -17,7 +17,6 @@ app.secret_key = os.environ.get("SECRET_KEY", "change-this-secret-key")
 
 DB_PATH = os.environ.get("DB_PATH", os.path.join(os.path.dirname(__file__), "app.db"))
 ADMIN_PASSWORD = os.environ.get("ADMIN_PASSWORD", "changeme123")
-CONVERSION_API_KEY = os.environ.get("CONVERSION_API_KEY", "changeme-api-key")
 
 TEMPLATES = {
     "template1": {"label": "Front Desk (light)"},
@@ -36,59 +35,77 @@ LANDING_BASE = """
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
 <title>{{ site_title }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root {
-    --cream: __CREAM__; --teal: __TEAL__; --teal-soft: __TEALSOFT__;
-    --brass: __BRASS__; --ink: __INK__; --ink-soft: __INKSOFT__; --card: __CARD__;
+    --bg: __BG__; --bg-glow: __BGGLOW__; --card: __CARD__; --border: __BORDER__;
+    --ink: __INK__; --ink-soft: __INKSOFT__; --heading: __HEADING__; --brass: __BRASS__;
+    --cta-bg: __CTABG__; --cta-text: __CTATEXT__; --cta-shadow: __CTASHADOW__;
+    --perk-bg: __PERKBG__; --perk-color: __PERKCOLOR__;
   }
   * { box-sizing: border-box; }
-  html, body { margin: 0; height: 100%; background: var(--cream); color: var(--ink); font-family: 'Inter', sans-serif; }
+  html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font-family: 'Inter', sans-serif; }
   body {
     display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 24px;
-    background-image: radial-gradient(circle at 50% 0%, var(--teal-soft) 0%, var(--cream) 60%);
+    background-image: radial-gradient(circle at 50% 0%, var(--bg-glow) 0%, var(--bg) 60%);
   }
   .card {
-    width: 100%; max-width: 420px; background: var(--card);
-    border: 1px solid __BORDER__; border-radius: 4px; padding: 40px 32px 32px;
+    width: 100%; max-width: 440px; background: var(--card);
+    border: 1px solid var(--border); border-radius: 10px; padding: 40px 32px 34px;
     box-shadow: __SHADOW__;
+    opacity: 0; transform: translateY(10px);
+    animation: rise 0.5s ease-out forwards;
   }
+  @keyframes rise { to { opacity: 1; transform: translateY(0); } }
   .eyebrow {
     display: flex; align-items: center; gap: 8px; font-size: 11px; letter-spacing: 0.14em;
     text-transform: uppercase; color: var(--brass); font-weight: 600; margin-bottom: 18px;
   }
   .eyebrow .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--brass); animation: pulse 2.2s ease-in-out infinite; }
   @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.7); } }
-  h1 { font-family: 'Fraunces', serif; font-weight: 600; font-size: 28px; line-height: 1.25; margin: 0 0 10px; color: var(--teal); }
-  p.sub { font-size: 14.5px; line-height: 1.55; color: var(--ink-soft); margin: 0 0 28px; }
-  .directory { border-top: 1px solid __BORDER__; }
-  a.row {
-    display: flex; align-items: center; justify-content: space-between; padding: 16px 4px;
-    text-decoration: none; color: var(--ink); border-bottom: 1px solid __BORDER__;
-    transition: padding-left 0.18s ease, color 0.18s ease;
+  h1 { font-family: 'Fraunces', serif; font-weight: 700; font-size: 29px; line-height: 1.22; margin: 0 0 10px; color: var(--heading); }
+  p.sub { font-size: 15px; line-height: 1.55; color: var(--ink-soft); margin: 0 0 22px; }
+  .perks { list-style: none; margin: 0 0 26px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+  .perks li { display: flex; align-items: center; gap: 10px; font-size: 13.5px; color: var(--ink); }
+  .perks .check {
+    flex-shrink: 0; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--perk-bg); color: var(--perk-color); font-size: 11px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center;
   }
-  a.row:hover, a.row:active { padding-left: 8px; color: var(--teal); }
-  a.row .label { font-size: 15.5px; font-weight: 500; }
-  a.row .arrow { color: var(--brass); font-size: 16px; transition: transform 0.18s ease; }
-  a.row:hover .arrow { transform: translateX(3px); }
-  .foot { margin-top: 26px; text-align: center; font-size: 11.5px; color: var(--ink-soft); }
-  @media (prefers-reduced-motion: reduce) { .eyebrow .dot { animation: none; } }
+  .cta-group { display: flex; flex-direction: column; gap: 10px; }
+  a.cta {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    background: var(--cta-bg); color: var(--cta-text); text-decoration: none;
+    font-size: 15.5px; font-weight: 600; padding: 15px 20px; border-radius: 7px;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    box-shadow: 0 8px 20px -8px var(--cta-shadow);
+  }
+  a.cta:hover, a.cta:active { transform: translateY(-1px); box-shadow: 0 12px 24px -8px var(--cta-shadow); }
+  a.cta .arrow { font-size: 16px; transition: transform 0.18s ease; opacity: 0.8; }
+  a.cta:hover .arrow { transform: translateX(3px); }
+  a.cta:nth-child(n+2) { background: transparent; color: var(--heading); border: 1.5px solid var(--border); box-shadow: none; }
+  .foot { margin-top: 24px; text-align: center; font-size: 11.5px; color: var(--ink-soft); }
+  @media (prefers-reduced-motion: reduce) { .eyebrow .dot { animation: none; } .card { animation: none; opacity: 1; transform: none; } }
 </style>
 </head>
 <body>
   <main class="card">
-    <div class="eyebrow"><span class="dot"></span> Front Desk &middot; Now Open</div>
-    <h1>How can we help you today?</h1>
-    <p class="sub">Pick an option below and we'll connect you right away.</p>
-    <div class="directory">
+    <div class="eyebrow"><span class="dot"></span> {{ site_badge }}</div>
+    <h1>{{ site_title }}</h1>
+    <p class="sub">{{ site_subtitle }}</p>
+    <ul class="perks">
+      {% for perk in perks %}
+      <li><span class="check">&#10003;</span> {{ perk }}</li>
+      {% endfor %}
+    </ul>
+    <div class="cta-group">
       {% for link in links %}
-      <a class="row" href="{{ url_for('go', link_id=link['id']) }}">
-        <span class="label">{{ link['name'] }}</span>
-        <span class="arrow">&#8594;</span>
+      <a class="cta" href="{{ url_for('go', link_id=link['id']) }}">
+        {{ link['name'] }} <span class="arrow">&#8594;</span>
       </a>
       {% endfor %}
     </div>
-    <div class="foot">We usually respond within a few minutes.</div>
+    <div class="foot">Free to join &middot; leave anytime.</div>
   </main>
 </body>
 </html>
@@ -96,19 +113,25 @@ LANDING_BASE = """
 
 LANDING_TEMPLATE_1 = (
     LANDING_BASE
-    .replace("__CREAM__", "#FAF6EF").replace("__TEAL__", "#0F3D3E")
-    .replace("__TEALSOFT__", "#E7EEE9").replace("__BRASS__", "#C9A66B")
-    .replace("__INK__", "#22262B").replace("__INKSOFT__", "#6B7268")
+    .replace("__BG__", "#FAF6EF").replace("__BGGLOW__", "#E7EEE9")
     .replace("__CARD__", "#FFFFFF").replace("__BORDER__", "rgba(15,61,62,0.10)")
+    .replace("__INK__", "#22262B").replace("__INKSOFT__", "#6B7268")
+    .replace("__HEADING__", "#0F3D3E").replace("__BRASS__", "#C9A66B")
+    .replace("__CTABG__", "#0F3D3E").replace("__CTATEXT__", "#FFFFFF")
+    .replace("__CTASHADOW__", "rgba(15,61,62,0.35)")
+    .replace("__PERKBG__", "#E7EEE9").replace("__PERKCOLOR__", "#0F3D3E")
     .replace("__SHADOW__", "0 20px 50px -20px rgba(15,61,62,0.25)")
 )
 
 LANDING_TEMPLATE_2 = (
     LANDING_BASE
-    .replace("__CREAM__", "#14181A").replace("__TEAL__", "#F2EEE4")
-    .replace("__TEALSOFT__", "rgba(62,142,130,0.12)").replace("__BRASS__", "#D9B27C")
-    .replace("__INK__", "#F2EEE4").replace("__INKSOFT__", "#8B9391")
+    .replace("__BG__", "#14181A").replace("__BGGLOW__", "rgba(62,142,130,0.12)")
     .replace("__CARD__", "#1B2123").replace("__BORDER__", "rgba(217,178,124,0.16)")
+    .replace("__INK__", "#F2EEE4").replace("__INKSOFT__", "#8B9391")
+    .replace("__HEADING__", "#F2EEE4").replace("__BRASS__", "#D9B27C")
+    .replace("__CTABG__", "#D9B27C").replace("__CTATEXT__", "#14181A")
+    .replace("__CTASHADOW__", "rgba(217,178,124,0.35)")
+    .replace("__PERKBG__", "rgba(217,178,124,0.15)").replace("__PERKCOLOR__", "#D9B27C")
     .replace("__SHADOW__", "0 24px 60px -20px rgba(0,0,0,0.6)")
 )
 
@@ -194,6 +217,11 @@ body { margin: 0; background: #F4F2EE; color: #22262B; font-family: 'Inter', san
 .settings-form .field { display: flex; flex-direction: column; gap: 6px; }
 .settings-form label { font-size: 12px; color: #6B7268; }
 .settings-form input, .settings-form select { border: 1px solid rgba(15,61,62,0.15); border-radius: 3px; padding: 8px 10px; font-size: 13px; font-family: inherit; min-width: 220px; }
+.settings-form-stacked { flex-direction: column; align-items: stretch; }
+.settings-form-stacked .field { width: 100%; }
+.settings-form-stacked input, .settings-form-stacked select { width: 100%; min-width: 0; }
+.key-row { display: flex; gap: 8px; align-items: center; margin: 10px 0; }
+.key-row input { flex: 1; border: 1px solid rgba(15,61,62,0.15); border-radius: 3px; padding: 8px 10px; font-size: 12.5px; font-family: 'SFMono-Regular', Consolas, monospace; background: #F4F2EE; color: #22262B; }
 @media (max-width: 800px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } .grid-2 { grid-template-columns: 1fr; } }
 </style>
 </head>
@@ -264,25 +292,35 @@ body { margin: 0; background: #F4F2EE; color: #22262B; font-family: 'Inter', san
     <section class="panel">
       <h2>Bot integration (conversion tracking)</h2>
       <p class="hint">
-        Each click now carries a one-time token to your Telegram bot as a
+        Each click carries a one-time token to your Telegram bot as a
         <code>?start=</code> deep-link parameter. In your bot's <code>/start</code>
-        handler, read that parameter and report it back here so this
-        dashboard knows the click actually reached your bot:
+        handler, read that parameter and report it back here — this key is
+        managed right here, no server config needed:
       </p>
+      <div class="key-row">
+        <input type="text" id="api-key-field" value="{{ conversion_api_key }}" readonly>
+        <button type="button" class="btn-small" onclick="copyApiKey()">Copy</button>
+      </div>
+      <form method="post" action="{{ url_for('admin_regenerate_api_key') }}" class="inline">
+        <button type="submit" class="btn-small danger" onclick="return confirm('Regenerate the key? Your bot code will need updating with the new key.')">Regenerate key</button>
+      </form>
       <pre class="code-block">POST {{ request.host_url }}api/conversion
-Header: X-API-Key: &lt;your CONVERSION_API_KEY&gt;
+Header: X-API-Key: {{ conversion_api_key }}
 JSON body: {"token": "&lt;the start param the bot received&gt;"}</pre>
       <p class="hint">
         In <code>python-telegram-bot</code>, that's <code>context.args[0]</code>
-        inside your <code>/start</code> handler. Set <code>CONVERSION_API_KEY</code>
-        as an environment variable on this app — it must match what your bot sends.
+        inside your <code>/start</code> handler — send it to the URL above with
+        this key in the header, and this dashboard will show the conversion.
       </p>
     </section>
 
     <section class="panel">
-      <h2>Template &amp; page settings</h2>
-      <form method="post" action="{{ url_for('admin_update_settings') }}" class="settings-form">
-        <div class="field"><label>Page title</label><input type="text" name="site_title" value="{{ site_title }}"></div>
+      <h2>Landing page copy &amp; template</h2>
+      <form method="post" action="{{ url_for('admin_update_settings') }}" class="settings-form settings-form-stacked">
+        <div class="field"><label>Badge (small text above headline)</label><input type="text" name="site_badge" value="{{ site_badge }}"></div>
+        <div class="field"><label>Headline</label><input type="text" name="site_title" value="{{ site_title }}"></div>
+        <div class="field"><label>Subheading</label><input type="text" name="site_subtitle" value="{{ site_subtitle }}"></div>
+        <div class="field"><label>Benefits (comma-separated)</label><input type="text" name="site_perks" value="{{ site_perks }}"></div>
         <div class="field">
           <label>Active template</label>
           <select name="active_template">
@@ -300,6 +338,17 @@ JSON body: {"token": "&lt;the start param the bot received&gt;"}</pre>
 <script>
 function escapeHtml(s) { return (s || "").toString().replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"); }
 function fmtTime(iso) { try { return new Date(iso).toLocaleString(); } catch (e) { return iso; } }
+
+function copyApiKey() {
+  const field = document.getElementById("api-key-field");
+  navigator.clipboard.writeText(field.value).then(() => {
+    field.focus();
+    field.select();
+  }).catch(() => {
+    field.focus();
+    field.select();
+  });
+}
 
 async function refreshStats() {
   try {
@@ -403,12 +452,27 @@ def init_db():
         except sqlite3.OperationalError:
             pass  # column already exists
     db.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('active_template', 'template1')")
-    db.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('site_title', 'Front Desk')")
+    db.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('site_badge', 'Instant access · Online now')")
+    db.execute("INSERT OR IGNORE INTO settings (key, value) VALUES ('site_title', 'You''re one tap away from joining')")
+    db.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES "
+        "('site_subtitle', 'Join for instant updates, exclusive content, and direct access to the team.')"
+    )
+    db.execute(
+        "INSERT OR IGNORE INTO settings (key, value) VALUES "
+        "('site_perks', 'Instant access, no forms,Daily updates & exclusive content,Real replies from our team')"
+    )
+    existing_key = db.execute("SELECT value FROM settings WHERE key = 'conversion_api_key'").fetchone()
+    if not existing_key:
+        db.execute(
+            "INSERT INTO settings (key, value) VALUES ('conversion_api_key', ?)",
+            (secrets.token_urlsafe(24),),
+        )
     cur = db.execute("SELECT COUNT(*) FROM links")
     if cur.fetchone()[0] == 0:
         db.execute(
             "INSERT INTO links (name, url, active, sort_order) VALUES (?, ?, 1, 0)",
-            ("Contact Receptionist", "https://t.me/your_bot_here"),
+            ("Join Now", "https://t.me/your_bot_here"),
         )
     db.commit()
     db.close()
@@ -535,9 +599,13 @@ def landing():
     links = db.execute("SELECT * FROM links WHERE active = 1 ORDER BY sort_order ASC, id ASC").fetchall()
     template_key = get_setting("active_template", "template1")
     html = TEMPLATE_HTML.get(template_key, LANDING_TEMPLATE_1)
-    site_title = get_setting("site_title", "Front Desk")
+    site_title = get_setting("site_title", "You're one tap away from joining")
+    site_subtitle = get_setting("site_subtitle", "Join for instant updates, exclusive content, and direct access to the team.")
+    site_badge = get_setting("site_badge", "Instant access · Online now")
+    perks_raw = get_setting("site_perks", "Instant access, no forms,Daily updates & exclusive content,Real replies from our team")
+    perks = [p.strip() for p in perks_raw.split(",") if p.strip()]
 
-    resp = render_template_string(html, links=links, site_title=site_title)
+    resp = render_template_string(html, links=links, site_title=site_title, site_subtitle=site_subtitle, site_badge=site_badge, perks=perks)
     response = app.make_response(resp)
     response.set_cookie("src", source, max_age=60 * 60 * 24 * 7, samesite="Lax")
     return response
@@ -580,7 +648,7 @@ def api_conversion():
         Header: X-API-Key: <CONVERSION_API_KEY>
         JSON body: {"token": "<the start-param value the bot received>"}
     """
-    if request.headers.get("X-API-Key") != CONVERSION_API_KEY:
+    if request.headers.get("X-API-Key") != get_setting("conversion_api_key"):
         abort(401)
     token = (request.get_json(silent=True) or {}).get("token") or request.form.get("token")
     if not token:
@@ -627,10 +695,16 @@ def admin_dashboard():
     db = get_db()
     links = db.execute("SELECT * FROM links ORDER BY sort_order ASC, id ASC").fetchall()
     active_template = get_setting("active_template", "template1")
-    site_title = get_setting("site_title", "Front Desk")
+    site_title = get_setting("site_title", "You're one tap away from joining")
+    site_subtitle = get_setting("site_subtitle", "Join for instant updates, exclusive content, and direct access to the team.")
+    site_badge = get_setting("site_badge", "Instant access · Online now")
+    site_perks = get_setting("site_perks", "Instant access, no forms,Daily updates & exclusive content,Real replies from our team")
+    conversion_api_key = get_setting("conversion_api_key", "")
     return render_template_string(
         ADMIN_DASHBOARD_HTML, links=links, templates=TEMPLATES,
         active_template=active_template, site_title=site_title,
+        site_subtitle=site_subtitle, site_badge=site_badge, site_perks=site_perks,
+        conversion_api_key=conversion_api_key,
     )
 
 
@@ -672,10 +746,26 @@ def admin_delete_link(link_id):
 def admin_update_settings():
     template_key = request.form.get("active_template")
     site_title = request.form.get("site_title", "").strip()
+    site_subtitle = request.form.get("site_subtitle", "").strip()
+    site_badge = request.form.get("site_badge", "").strip()
+    site_perks = request.form.get("site_perks", "").strip()
     if template_key in TEMPLATES:
         set_setting("active_template", template_key)
     if site_title:
         set_setting("site_title", site_title)
+    if site_subtitle:
+        set_setting("site_subtitle", site_subtitle)
+    if site_badge:
+        set_setting("site_badge", site_badge)
+    if site_perks:
+        set_setting("site_perks", site_perks)
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.route("/admin/regenerate-api-key", methods=["POST"])
+@login_required
+def admin_regenerate_api_key():
+    set_setting("conversion_api_key", secrets.token_urlsafe(24))
     return redirect(url_for("admin_dashboard"))
 
 
